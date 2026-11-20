@@ -4,6 +4,16 @@ A small FastAPI service for library staff to manage the books held by a library.
 
 Authentication and authorization are intentionally out of scope for this task.
 
+## Additional comments
+
+The implementation is intentionally kept small for this assignment:
+
+- The database has one `books` table. Borrower card numbers are stored on the current book loan instead of introducing a separate borrowers/users table and a foreign key. This means the API does not verify that a card belongs to a registered library member or maintain borrower records.
+- Only the current loan is represented. Returning a book clears its borrower card number and borrow timestamp, so the API does not retain loan history.
+- The service rejects a loan when it reads the book as already borrowed, but the read and update are not atomic. Simultaneous requests could both observe an available book and overwrite the borrower information. A higher-concurrency deployment should use an atomic conditional update or row locking, and test that behavior.
+
+These are scope choices for the recruitment task, not recommendations for a production library system.
+
 ## Features
 
 - Add a book and list all books.
