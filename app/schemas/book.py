@@ -2,7 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, model_validator
 
-
+#classes here represents data structures expected after different requests to the api endpoints
+#as we need different data structures and different field validatiotions for different endpoints
 class BookCreate(BaseModel):
     serial_number: str = Field(pattern=r"^\d{6}$")
     title: str = Field(min_length=1, max_length=255)

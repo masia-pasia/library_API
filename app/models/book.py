@@ -5,11 +5,14 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.database import Base
 
+#in a book class, which represents a book record in the database, I decided to use additional field id as a primary key
+#serial_number is a unique value and could be used as such, but if in the future something was to change then it's safer to have a separate primary key
 
 class Book(Base):
     __tablename__ = "books"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
 
     serial_number: Mapped[str] = mapped_column(
         String(6),
