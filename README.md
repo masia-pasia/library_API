@@ -22,6 +22,7 @@ These are scope choices for the recruitment task, not recommendations for a prod
 - Record the borrower's six-digit library card number and the time of borrowing.
 - Validate request bodies and path parameters with Pydantic and FastAPI.
 - Apply database schema migrations with Alembic.
+- Log successful book changes and failed requests without logging borrower card numbers or request payloads.
 
 ## Run with Docker Compose
 
@@ -41,7 +42,21 @@ Compose starts PostgreSQL, waits for its health check, then builds and starts th
 
 Stop the services with `Ctrl+C`. To stop and remove the containers while keeping database data, run `docker compose down`. To also delete the database volume and its data, run `docker compose down --volumes`.
 
-The credentials in `docker-compose.yml` are for local development only and must not be used for a public deployment.
+### Configuration and secrets
+
+The API requires one environment setting: `DATABASE_URL`. For this local project, Docker Compose provides it directly in `docker-compose.yml`. Compose also provides `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` to initialize the local PostgreSQL container. These values are development conveniences, not production credentials. In higher environments, supply the database connection string through the deployment platform's secret management rather than storing credentials in the Compose file or source code.
+
+## Logs
+
+The API writes logs to standard output. Successful book creation, deletion, borrowing, and return are logged with the book serial number. Failed HTTP responses are logged with the request method, path, and status code; unhandled request exceptions are logged with a traceback. Request bodies, headers, query strings, and borrower card numbers are not logged.
+
+With Docker Compose, view the API logs with:
+
+```shell
+docker compose logs api
+```
+
+Follow new log entries with `docker compose logs -f api`. When running the API locally, logs appear in the Uvicorn terminal.
 
 ## API
 

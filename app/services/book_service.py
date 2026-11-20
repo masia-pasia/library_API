@@ -1,4 +1,5 @@
 
+import logging
 from datetime import datetime, timezone
 
 from fastapi import HTTPException
@@ -7,6 +8,9 @@ from sqlalchemy.orm import Session
 
 from app.models.book import Book
 from app.schemas.book import BookCreate, BookStatusUpdate
+
+
+logger = logging.getLogger(__name__)
 
 
 def create_book(db: Session, book_data: BookCreate) -> Book:
@@ -31,6 +35,7 @@ def create_book(db: Session, book_data: BookCreate) -> Book:
     db.add(book)
     db.commit()
     db.refresh(book)
+    logger.info("Book %s created", book.serial_number)
 
     return book
 
@@ -58,6 +63,7 @@ def delete_book(db: Session, serial_number: str) -> None:
 
     db.delete(book)
     db.commit()
+    logger.info("Book %s deleted", serial_number)
 
 
 def update_book_status(
@@ -103,5 +109,7 @@ def update_book_status(
 
     db.commit()
     db.refresh(book)
+    action = "borrowed" if status_data.is_borrowed else "returned"
+    logger.info("Book %s %s", serial_number, action)
 
     return book

@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 import pytest
@@ -104,3 +105,14 @@ def test_duplicate_book_and_missing_book_responses(client):
     assert duplicate_response.status_code == 409
     assert missing_delete_response.status_code == 404
     assert missing_status_response.status_code == 404
+
+
+def test_failed_requests_are_logged(client, caplog):
+    with caplog.at_level(logging.WARNING, logger="app.main"):
+        missing_response = client.delete("/books/999999")
+        invalid_path_response = client.delete("/books/123")
+
+    assert missing_response.status_code == 404
+    assert invalid_path_response.status_code == 422
+    assert "DELETE /books/999999 returned 404" in caplog.text
+    assert "DELETE /books/123 returned 422" in caplog.text
